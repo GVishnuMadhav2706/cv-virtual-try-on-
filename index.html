@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dice Game Probability Analyzer | DAA Project</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-overlay"></div>
+  <div class="floating-dice" aria-hidden="true">
+    <span class="float-die">⚀</span>
+    <span class="float-die">⚁</span>
+    <span class="float-die">⚂</span>
+    <span class="float-die">⚃</span>
+    <span class="float-die">⚄</span>
+    <span class="float-die">⚅</span>
+  </div>
+
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-icon">🎲</span>
+      <div>
+        <h1>Dice Game Probability Analyzer</h1>
+        <p class="subtitle">Dynamic Programming · Design &amp; Analysis of Algorithms</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Input & Dice Simulation -->
+    <section class="glass-card input-section" id="input-section">
+      <h2><span class="section-icon">🎯</span> Dice Input &amp; Simulation</h2>
+      <div class="input-grid">
+        <div class="form-group">
+          <label for="numDice">Number of Dice (n)</label>
+          <input type="number" id="numDice" min="1" max="8" value="2" />
+          <span class="hint">1 – 8 dice supported</span>
+        </div>
+        <div class="form-group">
+          <label for="targetSum">Target Sum</label>
+          <input type="number" id="targetSum" min="1" value="7" />
+          <span class="hint" id="sumRangeHint">Valid range updates automatically</span>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-primary" id="analyzeBtn">
+          <span>Analyze Probability</span>
+        </button>
+        <button type="button" class="btn btn-secondary" id="rollBtn">
+          <span>🎲 Roll Dice</span>
+        </button>
+      </div>
+
+      <div class="dice-arena" id="diceArena">
+        <p class="arena-placeholder">Enter dice count and click Roll or Analyze</p>
+      </div>
+      <div class="roll-result" id="rollResult"></div>
+    </section>
+
+    <!-- Quick Result -->
+    <section class="glass-card result-banner" id="resultBanner">
+      <div class="result-stat">
+        <span class="stat-label">Probability</span>
+        <span class="stat-value" id="probPercent">—</span>
+      </div>
+      <div class="result-stat">
+        <span class="stat-label">Successful Ways</span>
+        <span class="stat-value" id="successWays">—</span>
+      </div>
+      <div class="result-stat">
+        <span class="stat-label">Total Outcomes</span>
+        <span class="stat-value" id="totalOutcomes">—</span>
+      </div>
+      <div class="result-stat highlight">
+        <span class="stat-label">Fraction</span>
+        <span class="stat-value" id="probFraction">—</span>
+      </div>
+    </section>
+
+    <!-- Step-by-Step Calculation -->
+    <section class="glass-card steps-section">
+      <h2><span class="section-icon">📐</span> Step-by-Step Calculation</h2>
+      <div class="steps-container" id="stepsContainer">
+        <p class="placeholder-text">Click "Analyze Probability" to see detailed mathematical steps.</p>
+      </div>
+    </section>
+
+    <!-- DP Table -->
+    <section class="glass-card dp-table-section">
+      <h2><span class="section-icon">📊</span> Dynamic Programming Table</h2>
+      <p class="section-desc">DP[d][s] = number of ways to obtain sum <em>s</em> using exactly <em>d</em> dice.</p>
+      <div class="dp-table-wrapper" id="dpTableWrapper">
+        <p class="placeholder-text">DP table appears after analysis.</p>
+      </div>
+    </section>
+
+    <!-- Probability Distribution Chart -->
+    <section class="glass-card chart-section">
+      <h2><span class="section-icon">📈</span> Probability Distribution</h2>
+      <p class="section-desc">Probability of each possible sum for the selected number of dice.</p>
+      <div class="chart-container">
+        <canvas id="probChart"></canvas>
+      </div>
+      <div class="distribution-insights" id="distributionInsights"></div>
+    </section>
+
+    <!-- Complexity Analysis -->
+    <section class="glass-card complexity-section">
+      <h2><span class="section-icon">⏱️</span> Time &amp; Space Complexity Analysis</h2>
+      <p class="section-desc">Comparing Brute Force, Recursion, and Dynamic Programming for <strong id="complexityN">n</strong> dice and target <strong id="complexityT">t</strong>.</p>
+      <div class="table-wrapper">
+        <table class="complexity-table">
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Time Complexity</th>
+              <th>Space Complexity</th>
+              <th>Efficiency</th>
+            </tr>
+          </thead>
+          <tbody id="complexityTableBody"></tbody>
+        </table>
+      </div>
+      <div class="complexity-details" id="complexityDetails"></div>
+    </section>
+
+    <!-- Complexity Comparison Chart -->
+    <section class="glass-card chart-section">
+      <h2><span class="section-icon">📉</span> Complexity Growth Comparison</h2>
+      <p class="section-desc">Operations vs. number of dice — exponential vs. polynomial growth.</p>
+      <div class="chart-container chart-tall">
+        <canvas id="complexityChart"></canvas>
+      </div>
+    </section>
+
+    <!-- DP Education -->
+    <section class="glass-card education-section">
+      <h2><span class="section-icon">📚</span> Dynamic Programming Explained</h2>
+      <div class="edu-grid">
+        <article class="edu-card">
+          <h3>What is Dynamic Programming?</h3>
+          <p>Dynamic Programming (DP) is an optimization technique that solves complex problems by breaking them into overlapping subproblems, storing results to avoid redundant computation.</p>
+        </article>
+        <article class="edu-card">
+          <h3>Overlapping Subproblems</h3>
+          <p>When counting dice sums, the same sub-counts appear repeatedly. For example, ways to reach sum 5 with 2 dice reuse results from 1-dice problems — classic overlap.</p>
+        </article>
+        <article class="edu-card">
+          <h3>Optimal Substructure</h3>
+          <p>The optimal count for <code>n</code> dice and sum <code>s</code> builds from optimal counts for fewer dice: each face value <code>i</code> contributes <code>DP[n-1][s-i]</code>.</p>
+        </article>
+        <article class="edu-card">
+          <h3>State Transition</h3>
+          <p class="formula">DP[d][s] = Σ DP[d−1][s−i] for i = 1 to 6</p>
+          <p>Base case: <code>DP[1][s] = 1</code> if 1 ≤ s ≤ 6, else 0.</p>
+        </article>
+        <article class="edu-card">
+          <h3>Memoization vs Tabulation</h3>
+          <p><strong>Memoization (top-down):</strong> Recursion + cache stored results.<br><strong>Tabulation (bottom-up):</strong> Fill a 2D table iteratively — used in this analyzer.</p>
+        </article>
+        <article class="edu-card">
+          <h3>Why DP Beats Recursion</h3>
+          <p>Naive recursion revisits the same (dice, sum) states exponentially. DP computes each state once in O(n × target) time — a dramatic reduction from exponential blow-up.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>DAA Mini Project · Dice Game Probability Analyzer using Dynamic Programming</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
